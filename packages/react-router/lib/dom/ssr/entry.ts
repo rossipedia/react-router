@@ -1,4 +1,4 @@
-import type { StaticHandlerContext } from "../../router/router";
+import type { SpaMode, StaticHandlerContext } from "../../router/router";
 
 import type { EntryRoute } from "./routes";
 import type { RouteModules } from "./routeModules";
@@ -16,7 +16,7 @@ export interface FrameworkContextObject {
   criticalCss?: string;
   serverHandoffString?: string;
   future: FutureConfig;
-  isSpaMode: boolean;
+  isSpaMode: SpaMode;
   serializeError?(error: Error): SerializedError;
   renderMeta?: {
     didRenderScripts?: boolean;

@@ -1,6 +1,6 @@
 import * as React from "react";
 import type { PatchRoutesOnNavigationFunction } from "../../context";
-import type { Router as DataRouter } from "../../router/router";
+import type { Router as DataRouter, SpaMode } from "../../router/router";
 import type { RouteManifest } from "../../router/utils";
 import { matchRoutes } from "../../router/utils";
 import type { AssetsManifest } from "./entry";
@@ -26,7 +26,7 @@ const discoveredPaths = new Set<string>();
 // https://stackoverflow.com/a/417184
 const URL_LIMIT = 7680;
 
-export function isFogOfWarEnabled(isSpaMode: boolean) {
+export function isFogOfWarEnabled(isSpaMode: SpaMode): isSpaMode is "strict" | "hybrid" {
   return !isSpaMode;
 }
 
@@ -70,7 +70,7 @@ export function getPartialManifest(
 export function getPatchRoutesOnNavigationFunction(
   manifest: AssetsManifest,
   routeModules: RouteModules,
-  isSpaMode: boolean,
+  isSpaMode: SpaMode,
   basename: string | undefined
 ): PatchRoutesOnNavigationFunction | undefined {
   if (!isFogOfWarEnabled(isSpaMode)) {
@@ -96,7 +96,7 @@ export function useFogOFWarDiscovery(
   router: DataRouter,
   manifest: AssetsManifest,
   routeModules: RouteModules,
-  isSpaMode: boolean
+  isSpaMode: SpaMode
 ) {
   React.useEffect(() => {
     // Don't prefetch if not enabled or if the user has `saveData` enabled
@@ -203,7 +203,7 @@ export async function fetchAndApplyManifestPatches(
   paths: string[],
   manifest: AssetsManifest,
   routeModules: RouteModules,
-  isSpaMode: boolean,
+  isSpaMode: SpaMode,
   basename: string | undefined,
   patchRoutes: DataRouter["patchRoutes"]
 ): Promise<void> {

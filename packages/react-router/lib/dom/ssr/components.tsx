@@ -5,7 +5,7 @@ import type {
 } from "react";
 import * as React from "react";
 
-import type { RouterState } from "../../router/router";
+import type { RouterState, SpaMode } from "../../router/router";
 import type { AgnosticDataRouteMatch } from "../../router/utils";
 import { matchRoutes } from "../../router/utils";
 
@@ -193,7 +193,7 @@ export function composeEventHandlers<
 function getActiveMatches(
   matches: RouterState["matches"],
   errors: RouterState["errors"],
-  isSpaMode: boolean
+  isSpaMode: SpaMode
 ) {
   if (isSpaMode && !isHydrated) {
     return [matches[0]];

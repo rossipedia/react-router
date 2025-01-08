@@ -522,9 +522,12 @@ export const reactRouterVitePlugin: ReactRouterVitePlugin = () => {
       )};
       export const basename = ${JSON.stringify(ctx.reactRouterConfig.basename)};
       export const future = ${JSON.stringify(ctx.reactRouterConfig.future)};
-      export const isSpaMode = ${
+      export const isSpaMode = ${JSON.stringify(
         !ctx.reactRouterConfig.ssr && ctx.reactRouterConfig.prerender == null
-      };
+          ? ctx.reactRouterConfig.serverOrigin
+            ? 'hybrid' : 'strict'
+            : false
+      )};
       export const publicPath = ${JSON.stringify(ctx.publicPath)};
       export const entry = { module: entryServer };
       export const routes = {
@@ -1251,13 +1254,13 @@ export const reactRouterVitePlugin: ReactRouterVitePlugin = () => {
 
           // For both SPA mode and prerendering, we can remove the server builds
           // if ssr:false is set
-          if (!ctx.reactRouterConfig.ssr) {
+          if (!ctx.reactRouterConfig.ssr && !ctx.reactRouterConfig.serverOrigin) {
             // Cleanup - we no longer need the server build assets
             viteConfig.logger.info(
               [
                 "Removing the server build in",
                 colors.green(serverBuildDirectory),
-                "due to ssr:false",
+                "due to ssr:false and no serverOrigin",
               ].join(" ")
             );
             fse.removeSync(serverBuildDirectory);
@@ -1433,16 +1436,18 @@ export const reactRouterVitePlugin: ReactRouterVitePlugin = () => {
         if (!route) return;
 
         if (!options?.ssr && !ctx.reactRouterConfig.ssr) {
-          let serverOnlyExports = esModuleLexer(code)[1]
-            .map((exp) => exp.n)
-            .filter((exp) => SERVER_ONLY_ROUTE_EXPORTS.includes(exp));
-          if (serverOnlyExports.length > 0) {
-            let str = serverOnlyExports.map((e) => `\`${e}\``).join(", ");
-            let message =
-              `SPA Mode: ${serverOnlyExports.length} invalid route export(s) in ` +
-              `\`${route.file}\`: ${str}. See https://remix.run/guides/spa-mode ` +
-              `for more information.`;
-            throw Error(message);
+          if (!ctx.reactRouterConfig.serverOrigin) {
+            let serverOnlyExports = esModuleLexer(code)[1]
+              .map((exp) => exp.n)
+              .filter((exp) => SERVER_ONLY_ROUTE_EXPORTS.includes(exp));
+            if (serverOnlyExports.length > 0) {
+              let str = serverOnlyExports.map((e) => `\`${e}\``).join(", ");
+              let message =
+                `SPA Mode (strict): ${serverOnlyExports.length} invalid route export(s) in ` +
+                `\`${route.file}\`: ${str}. See https://remix.run/guides/spa-mode ` +
+                `for more information.`;
+              throw Error(message);
+            }
           }
 
           if (route.id !== "root") {

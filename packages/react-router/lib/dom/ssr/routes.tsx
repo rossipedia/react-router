@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import type { HydrationState } from "../../router/router";
+import type { HydrationState, SpaMode } from "../../router/router";
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
@@ -60,7 +60,7 @@ function groupRoutesByParentId(manifest: RouteManifest<EntryRoute>) {
 function getRouteComponents(
   route: EntryRoute,
   routeModule: RouteModule,
-  isSpaMode: boolean
+  isSpaMode: SpaMode
 ) {
   let Component = getRouteModuleComponent(routeModule);
   // HydrateFallback can only exist on the root route in SPA Mode
@@ -115,7 +115,7 @@ export function createServerRoutes(
   manifest: RouteManifest<EntryRoute>,
   routeModules: RouteModules,
   future: FutureConfig,
-  isSpaMode: boolean,
+  isSpaMode: SpaMode,
   parentId: string = "",
   routesByParentId: Record<
     string,
@@ -171,7 +171,7 @@ export function createClientRoutesWithHMRRevalidationOptOut(
   routeModulesCache: RouteModules,
   initialState: HydrationState,
   future: FutureConfig,
-  isSpaMode: boolean
+  isSpaMode: SpaMode
 ) {
   return createClientRoutes(
     manifest,
@@ -187,9 +187,9 @@ export function createClientRoutesWithHMRRevalidationOptOut(
 function preventInvalidServerHandlerCall(
   type: "action" | "loader",
   route: Omit<EntryRoute, "children">,
-  isSpaMode: boolean
+  isSpaMode: SpaMode
 ) {
-  if (isSpaMode) {
+  if (isSpaMode === 'strict') {
     let fn = type === "action" ? "serverAction()" : "serverLoader()";
     let msg = `You cannot call ${fn} in SPA Mode (routeId: "${route.id}")`;
     console.error(msg);
@@ -225,7 +225,7 @@ export function createClientRoutes(
   manifest: RouteManifest<EntryRoute>,
   routeModulesCache: RouteModules,
   initialState: HydrationState | null,
-  isSpaMode: boolean,
+  isSpaMode: SpaMode,
   parentId: string = "",
   routesByParentId: Record<
     string,
@@ -320,7 +320,7 @@ export function createClientRoutes(
               "No `routeModule` available for critical-route loader"
             );
             if (!routeModule.clientLoader) {
-              if (isSpaMode) return null;
+              if (isSpaMode === 'strict') return null;
               // Call the server when no client loader exists
               return fetchServerLoader(singleFetch);
             }
@@ -371,7 +371,7 @@ export function createClientRoutes(
             "No `routeModule` available for critical-route action"
           );
           if (!routeModule.clientAction) {
-            if (isSpaMode) {
+            if (isSpaMode === 'strict') {
               throw noActionDefinedError("clientAction", route.id);
             }
             return fetchServerAction(singleFetch);
@@ -397,7 +397,7 @@ export function createClientRoutes(
           singleFetch?: unknown
         ) =>
           prefetchStylesAndCallHandler(() => {
-            if (isSpaMode) return Promise.resolve(null);
+            if (isSpaMode === 'strict') return Promise.resolve(null);
             return fetchServerLoader(singleFetch);
           });
       }
@@ -407,7 +407,7 @@ export function createClientRoutes(
           singleFetch?: unknown
         ) =>
           prefetchStylesAndCallHandler(() => {
-            if (isSpaMode) {
+            if (isSpaMode === 'strict') {
               throw noActionDefinedError("clientAction", route.id);
             }
             return fetchServerAction(singleFetch);
@@ -567,7 +567,7 @@ function getRouteModuleComponent(routeModule: RouteModule) {
 export function shouldHydrateRouteLoader(
   route: EntryRoute,
   routeModule: RouteModule,
-  isSpaMode: boolean
+  isSpaMode: SpaMode
 ) {
   return (
     (isSpaMode && route.id !== "root") ||

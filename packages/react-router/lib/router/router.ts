@@ -354,6 +354,11 @@ export type HydrationState = Partial<
 >;
 
 /**
+ * SPA mode
+ */
+export type SpaMode = 'strict' | 'hybrid' | false;
+
+/**
  * Future flags to toggle new feature behavior
  */
 export interface FutureConfig {}

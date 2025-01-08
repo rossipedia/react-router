@@ -1,4 +1,4 @@
-import type { HydrationState, Router as DataRouter } from "../router/router";
+import type { HydrationState, Router as DataRouter, SpaMode } from "../router/router";
 import type { AssetsManifest, FutureConfig } from "./ssr/entry";
 import type { RouteModules } from "./ssr/routeModules";
 
@@ -7,7 +7,7 @@ export type WindowReactRouterContext = {
   state: HydrationState;
   criticalCss?: string;
   future: FutureConfig;
-  isSpaMode: boolean;
+  isSpaMode: SpaMode;
   stream: ReadableStream<Uint8Array> | undefined;
   streamController: ReadableStreamDefaultController<Uint8Array>;
   // The number of active deferred keys rendered on the server

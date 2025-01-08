@@ -221,6 +221,10 @@ export type ResolvedReactRouterConfig = Readonly<{
    * SPA without server-rendering. Default's to `true`.
    */
   ssr: boolean;
+  /**
+   * TODO: Document
+   */
+  serverOrigin?: string;
 }>;
 
 let mergeReactRouterConfig = (

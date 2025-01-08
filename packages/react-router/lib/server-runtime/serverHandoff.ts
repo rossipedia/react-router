@@ -1,4 +1,4 @@
-import type { HydrationState } from "../router/router";
+import type { HydrationState, SpaMode } from "../router/router";
 import type { FutureConfig } from "../dom/ssr/entry";
 import { escapeHtml } from "./markup";
 
@@ -21,7 +21,7 @@ export function createServerHandoffString<T>(serverHandoff: {
   criticalCss?: string;
   basename: string | undefined;
   future: FutureConfig;
-  isSpaMode: boolean;
+  isSpaMode: SpaMode;
 }): string {
   // Uses faster alternative of jsesc to escape data returned from the loaders.
   // This string is inserted directly into the HTML in the `<Scripts>` element.

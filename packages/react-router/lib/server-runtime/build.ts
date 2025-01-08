@@ -6,6 +6,7 @@ import type {
 } from "../dom/ssr/entry";
 import type { ServerRouteManifest } from "./routes";
 import type { AppLoadContext } from "./data";
+import type { SpaMode } from "../router/router";
 
 /**
  * The output of the compiler for the server build.
@@ -20,7 +21,7 @@ export interface ServerBuild {
   publicPath: string;
   assetsBuildDirectory: string;
   future: FutureConfig;
-  isSpaMode: boolean;
+  isSpaMode: SpaMode;
 }
 
 export interface HandleDocumentRequestFunction {
