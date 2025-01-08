@@ -528,6 +528,11 @@ export const reactRouterVitePlugin: ReactRouterVitePlugin = () => {
             ? 'hybrid' : 'strict'
             : false
       )};
+      export const serverOrigin = ${
+        ctx.reactRouterConfig.serverOrigin
+          ? JSON.stringify(ctx.reactRouterConfig.serverOrigin)
+          : 'undefined'
+      };
       export const publicPath = ${JSON.stringify(ctx.publicPath)};
       export const entry = { module: entryServer };
       export const routes = {

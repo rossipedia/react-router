@@ -134,17 +134,18 @@ export function StreamTransfer({
 export function getSingleFetchDataStrategy(
   manifest: AssetsManifest,
   routeModules: RouteModules,
-  getRouter: () => DataRouter
+  getRouter: () => DataRouter,
+  serverOrigin: string | undefined
 ): DataStrategyFunction {
   return async ({ request, matches, fetcherKey }) => {
     // Actions are simple and behave the same for navigations and fetchers
     if (request.method !== "GET") {
-      return singleFetchActionStrategy(request, matches);
+      return singleFetchActionStrategy(request, matches, serverOrigin);
     }
 
     // Fetcher loads are singular calls to one loader
     if (fetcherKey) {
-      return singleFetchLoaderFetcherStrategy(request, matches);
+      return singleFetchLoaderFetcherStrategy(request, matches, serverOrigin);
     }
 
     // Navigational loads are more complex...
@@ -153,7 +154,8 @@ export function getSingleFetchDataStrategy(
       routeModules,
       getRouter(),
       request,
-      matches
+      matches,
+      serverOrigin,
     );
   };
 }
@@ -162,14 +164,15 @@ export function getSingleFetchDataStrategy(
 // navigations and fetchers)
 async function singleFetchActionStrategy(
   request: Request,
-  matches: DataStrategyFunctionArgs["matches"]
+  matches: DataStrategyFunctionArgs["matches"],
+  serverOrigin: string | undefined
 ) {
   let actionMatch = matches.find((m) => m.shouldLoad);
   invariant(actionMatch, "No action match found");
   let actionStatus: number | undefined = undefined;
   let result = await actionMatch.resolve(async (handler) => {
     let result = await handler(async () => {
-      let url = singleFetchUrl(request.url);
+      let url = singleFetchUrl(request.url, serverOrigin);
       let init = await createRequestInit(request);
       let { data, status } = await fetchAndDecode(url, init);
       actionStatus = status;
@@ -202,7 +205,8 @@ async function singleFetchLoaderNavigationStrategy(
   routeModules: RouteModules,
   router: DataRouter,
   request: Request,
-  matches: DataStrategyFunctionArgs["matches"]
+  matches: DataStrategyFunctionArgs["matches"],
+  serverOrigin: string | undefined
 ) {
   // Track which routes need a server load - in case we need to tack on a
   // `_routes` param
@@ -223,7 +227,7 @@ async function singleFetchLoaderNavigationStrategy(
   let singleFetchDfd = createDeferred<SingleFetchResults>();
 
   // Base URL and RequestInit for calls to the server
-  let url = stripIndexParam(singleFetchUrl(request.url));
+  let url = stripIndexParam(singleFetchUrl(request.url, serverOrigin));
   let init = await createRequestInit(request);
 
   // We'll build up this results object as we loop through matches
@@ -348,12 +352,13 @@ async function singleFetchLoaderNavigationStrategy(
 // Fetcher loader calls are much simpler than navigational loader calls
 async function singleFetchLoaderFetcherStrategy(
   request: Request,
-  matches: DataStrategyFunctionArgs["matches"]
+  matches: DataStrategyFunctionArgs["matches"],
+  serverOrigin: string | undefined
 ) {
   let fetcherMatch = matches.find((m) => m.shouldLoad);
   invariant(fetcherMatch, "No fetcher match found");
   let result = await fetcherMatch.resolve(async (handler) => {
-    let url = stripIndexParam(singleFetchUrl(request.url));
+    let url = stripIndexParam(singleFetchUrl(request.url, serverOrigin));
     let init = await createRequestInit(request);
     return fetchSingleLoader(handler, url, init, fetcherMatch!.route.id);
   });
@@ -392,7 +397,7 @@ function stripIndexParam(url: URL) {
   return url;
 }
 
-export function singleFetchUrl(reqUrl: URL | string) {
+export function singleFetchUrl(reqUrl: URL | string, serverOrigin: string | undefined) {
   let url =
     typeof reqUrl === "string"
       ? new URL(
@@ -404,6 +409,10 @@ export function singleFetchUrl(reqUrl: URL | string) {
             : window.location.origin
         )
       : reqUrl;
+
+  if (serverOrigin) {
+    url = new URL(url.pathname + url.search, serverOrigin);
+  }
 
   if (url.pathname === "/") {
     url.pathname = "_root.data";

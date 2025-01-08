@@ -171,7 +171,10 @@ function createHydratedRouter(): DataRouter {
     dataStrategy: getSingleFetchDataStrategy(
       ssrInfo.manifest,
       ssrInfo.routeModules,
-      () => router
+      () => router,
+      ssrInfo.context.isSpaMode === 'hybrid'
+        ? ssrInfo.context.serverOrigin
+        : undefined,
     ),
     patchRoutesOnNavigation: getPatchRoutesOnNavigationFunction(
       ssrInfo.manifest,

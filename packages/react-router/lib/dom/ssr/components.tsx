@@ -321,7 +321,7 @@ function PrefetchPageLinksImpl({
   matches: AgnosticDataRouteMatch[];
 }) {
   let location = useLocation();
-  let { manifest, routeModules } = useFrameworkContext();
+  let { manifest, routeModules, serverOrigin } = useFrameworkContext();
   let { loaderData, matches } = useDataRouterStateContext();
 
   let newMatchesForData = React.useMemo(
@@ -384,7 +384,7 @@ function PrefetchPageLinksImpl({
       return [];
     }
 
-    let url = singleFetchUrl(page);
+    let url = singleFetchUrl(page, serverOrigin);
     // When one or more routes have opted out, we add a _routes param to
     // limit the loaders to those that have a server loader and did not
     // opt out
@@ -407,6 +407,7 @@ function PrefetchPageLinksImpl({
     nextMatches,
     page,
     routeModules,
+    serverOrigin
   ]);
 
   let moduleHrefs = React.useMemo(

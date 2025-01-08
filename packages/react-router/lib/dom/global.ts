@@ -8,6 +8,7 @@ export type WindowReactRouterContext = {
   criticalCss?: string;
   future: FutureConfig;
   isSpaMode: SpaMode;
+  serverOrigin?: string;
   stream: ReadableStream<Uint8Array> | undefined;
   streamController: ReadableStreamDefaultController<Uint8Array>;
   // The number of active deferred keys rendered on the server

@@ -22,6 +22,7 @@ export interface ServerBuild {
   assetsBuildDirectory: string;
   future: FutureConfig;
   isSpaMode: SpaMode;
+  serverOrigin?: string;
 }
 
 export interface HandleDocumentRequestFunction {

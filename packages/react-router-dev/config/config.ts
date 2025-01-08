@@ -166,6 +166,10 @@ export type ReactRouterConfig = {
    * SPA without server-rendering. Default's to `true`.
    */
   ssr?: boolean;
+  /**
+   * TODO: Document
+   */
+  serverOrigin?: string;
 };
 
 export type ResolvedReactRouterConfig = Readonly<{
@@ -391,6 +395,7 @@ async function resolveConfig({
     serverBundles,
     serverModuleFormat,
     ssr,
+    serverOrigin,
   } = {
     ...defaults, // Default values should be completely overridden by user/preset config, not merged
     ...mergeReactRouterConfig(...presets, reactRouterUserConfig),
@@ -501,6 +506,7 @@ async function resolveConfig({
     serverBundles,
     serverModuleFormat,
     ssr,
+    serverOrigin,
   });
 
   for (let preset of reactRouterUserConfig.presets ?? []) {

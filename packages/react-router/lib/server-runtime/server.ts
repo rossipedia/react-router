@@ -381,6 +381,7 @@ async function handleDocumentRequest(
       criticalCss,
       future: build.future,
       isSpaMode: build.isSpaMode,
+      serverOrigin: build.serverOrigin,
     }),
     serverHandoffStream: encodeViaTurboStream(
       state,
