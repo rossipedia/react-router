@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
+    "build.electron": "esbuild --bundle --outdir=./build/electron --entry-names=main --out-extension:.js=.cjs --format=cjs --target=node20 --platform=node ./electron-app/index.ts && cp electron-app/package.json ./build/electron/package.json",
+    "start.electron": "electron ./build/electron",
     "dev": "react-router dev",
     "preview": "vite preview",
     "start": "cross-env PORT=4000 NODE_ENV=production node ./server.js",
@@ -33,6 +35,8 @@
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "cross-env": "^7.0.3",
+    "electron": "^33.3.1",
+    "esbuild": "0.17.6",
     "serve": "^14.2.4",
     "typescript": "^5.1.6",
     "vite": "^6.0.0",
