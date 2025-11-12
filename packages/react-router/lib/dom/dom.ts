@@ -7,19 +7,28 @@ export const defaultMethod: HTMLFormMethod = "get";
 const defaultEncType: FormEncType = "application/x-www-form-urlencoded";
 
 export function isHtmlElement(object: any): object is HTMLElement {
-  return object != null && typeof object.tagName === "string";
+  return typeof HTMLElement !== "undefined" && object instanceof HTMLElement;
 }
 
 export function isButtonElement(object: any): object is HTMLButtonElement {
-  return isHtmlElement(object) && object.tagName.toLowerCase() === "button";
+  return (
+    typeof HTMLButtonElement !== "undefined" &&
+    object instanceof HTMLButtonElement
+  );
 }
 
 export function isFormElement(object: any): object is HTMLFormElement {
-  return isHtmlElement(object) && object.tagName.toLowerCase() === "form";
+  return (
+    typeof HTMLFormElement !== "undefined" &&
+    object instanceof HTMLFormElement
+  );
 }
 
 export function isInputElement(object: any): object is HTMLInputElement {
-  return isHtmlElement(object) && object.tagName.toLowerCase() === "input";
+  return (
+    typeof HTMLInputElement !== "undefined" &&
+    object instanceof HTMLInputElement
+  );
 }
 
 type LimitedMouseEvent = Pick<
