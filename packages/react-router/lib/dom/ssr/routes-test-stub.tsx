@@ -37,7 +37,7 @@ import type { EntryRoute } from "./routes";
 import { FrameworkContext } from "./components";
 
 interface StubRouteExtensions {
-  Component?: RouteComponentType;
+  Component?: React.ComponentType<any>;
   HydrateFallback?: HydrateFallbackType;
   ErrorBoundary?: ErrorBoundaryType;
   loader?: LoaderFunction;
@@ -197,7 +197,7 @@ function processRoutes(
       path: route.path,
       index: route.index,
       Component: route.Component
-        ? withComponentProps(route.Component)
+        ? withComponentProps(route.Component as RouteComponentType)
         : undefined,
       HydrateFallback: route.HydrateFallback
         ? withHydrateFallbackProps(route.HydrateFallback)
